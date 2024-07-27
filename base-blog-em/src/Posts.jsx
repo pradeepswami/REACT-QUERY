@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 import { fetchPosts, deletePost, updatePost } from "./api";
 import { PostDetail } from "./PostDetail";
@@ -9,6 +9,13 @@ export function Posts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(null);
   const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn:(id) => deletePost(id),    
+  });
+
+  const updateMutation = useMutation({
+    mutationFn:(id) => updatePost(id),    
+  });
 
   // replace with useQuery
   const {data, isError, error,isLoading} = useQuery({
@@ -38,7 +45,12 @@ export function Posts() {
           <li
             key={post.id}
             className="post-title"
-            onClick={() => setSelectedPost(post)}
+            onClick={() => {
+              setSelectedPost(post);
+              deleteMutation.reset();
+              updateMutation.reset();
+            }
+            }
           >
             {post.title}
           </li>
@@ -54,7 +66,7 @@ export function Posts() {
         </button>
       </div>
       <hr />
-      {selectedPost && <PostDetail post={selectedPost} />}
+      {selectedPost && <PostDetail post={selectedPost} deleteHandler={deleteMutation} updateMutation={updateMutation} />}
     </>
   );
 }
