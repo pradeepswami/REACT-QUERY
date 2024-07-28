@@ -1,5 +1,18 @@
 import { toast } from "@/components/app/toast";
-import { QueryCache, QueryClient } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientConfig } from "@tanstack/react-query";
+
+
+export const queryClientOptions : QueryClientConfig = {
+  defaultOptions: {
+      queries: {
+          staleTime: 60000,
+          gcTime: 90000
+      }
+  },
+  queryCache: new QueryCache({
+      onError: (error) => errorHandler(error.message)
+  })
+};
 
 function errorHandler(errorMsg: string) {
 //   // https://chakra-ui.com/docs/components/toast#preventing-duplicate-toast
@@ -17,14 +30,4 @@ function errorHandler(errorMsg: string) {
    }
  }
 
-export default new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: 60000,
-            gcTime: 90000
-        }
-    },
-    queryCache: new QueryCache({
-        onError: (error) => errorHandler(error.message)
-    })
-});
+export default new QueryClient( queryClientOptions);
